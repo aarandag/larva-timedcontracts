@@ -31,4 +31,9 @@ public class ObligationContract extends Contract {
 			return this;
 		}
 	}
+	
+	@Override
+	public int timeout() {
+		return n_seconds;
+	}
 }

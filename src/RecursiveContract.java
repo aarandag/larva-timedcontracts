@@ -35,4 +35,9 @@ public class RecursiveContract extends Contract {
 			return this;
 		}
 	}
+	
+	@Override
+	public int timeout() {
+		return current_contract.timeout();
+	}
 }

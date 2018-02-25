@@ -30,4 +30,9 @@ public class DisjuctionContract extends CompositionContract {
 			return this;
 		}
 	}
+	
+	@Override
+	public int timeout() {
+		return Math.min(lContract.timeout(), rContract.timeout());
+	}
 }

@@ -26,4 +26,9 @@ public class ReparationContract extends CompositionContract {
 			return this;
 		}
 	}
+	
+	@Override
+	public int timeout() {
+		return lContract.timeout();
+	}
 }

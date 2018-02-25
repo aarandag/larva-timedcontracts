@@ -19,4 +19,9 @@ public class WaitContract extends Contract {
 			return this;
 		}
 	}
+	
+	@Override
+	public int timeout() {
+		return n_seconds;
+	}
 }

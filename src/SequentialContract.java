@@ -27,4 +27,8 @@ public class SequentialContract extends CompositionContract {
 		}
 	}
 
+	@Override
+	public int timeout() {
+		return lContract.timeout();
+	}
 }
