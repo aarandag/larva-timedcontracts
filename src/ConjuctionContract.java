@@ -5,18 +5,29 @@ public class ConjuctionContract extends CompositionContract {
 	} 
 	
 	@Override
-	public void timestep(int elapsed_seconds) {
-		lContract.timestep(elapsed_seconds);
-		rContract.timestep(elapsed_seconds);
-		this.setViolated(lContract.isViolated() || rContract.isViolated());
-		this.setFulfilled(lContract.isFulfilled() && rContract.isFulfilled());
+	public Contract timestep(int elapsed_seconds) {
+		return new ConjuctionContract(lContract.timestep(elapsed_seconds),
+				rContract.timestep(elapsed_seconds)).syntacticalEq();
 	}
 	
 	@Override
-	public void step(Event e) {
-		lContract.step(e);
-		rContract.step(e);
-		this.setViolated(lContract.isViolated() || rContract.isViolated());
-		this.setFulfilled(lContract.isFulfilled() && rContract.isFulfilled());
+	public Contract step(Event e) {
+		return new ConjuctionContract(lContract.step(e), 
+				rContract.step(e)).syntacticalEq();
+	}
+	
+	@Override
+	public Contract syntacticalEq() {
+		if(rContract instanceof TrueContract) { // Rule 1
+			return lContract;
+		} else if (lContract instanceof TrueContract) { // Rule 2
+			return rContract;
+		} else if (lContract instanceof FalseContract) { // Rule 3
+			return new FalseContract();
+		} else if (rContract instanceof FalseContract) { // Rule 4
+			return new FalseContract();
+		} else {
+			return this;
+		}
 	}
 }

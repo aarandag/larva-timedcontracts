@@ -1,7 +1,7 @@
 
 public abstract class CompositionContract extends Contract {
-	protected Contract lContract;
-	protected Contract rContract;
+	protected final Contract lContract;
+	protected final Contract rContract;
 	
 	public CompositionContract(Contract lContract, Contract rContract) {
 		this.lContract = lContract;

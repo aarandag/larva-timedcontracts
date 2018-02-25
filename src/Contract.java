@@ -1,30 +1,10 @@
 
 public abstract class Contract implements Cloneable {
-	private boolean isViolated = false;
-	private boolean isFulfilled = false;
 	
-	public void timestep(int elapsed_seconds) {};
-	public void step(Event event) {};
-	
-	public boolean isViolated() { return isViolated; }
-	public boolean isFulfilled() { return isFulfilled; }
-	protected void setViolated(boolean isViolated) {
-		if(!this.isViolated) {
-			this.isViolated = isViolated;
-			if(isViolated) {
-				this.isFulfilled = false;
-			}
-		}
-	}
-	protected void setFulfilled(boolean isFulfilled) { 
-		if(!this.isViolated) {
-			this.isFulfilled = isFulfilled; 
-			if(isFulfilled) {
-				this.isViolated = false;
-			}
-		}
-	}
-	
+	public Contract timestep(int elapsed_seconds) { return this; };
+	public Contract step(Event event) { return this; };
+	public Contract syntacticalEq() {return this; };
+
 	@Override
 	protected Contract clone() {
 		try {

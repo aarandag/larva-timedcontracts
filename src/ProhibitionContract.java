@@ -1,7 +1,7 @@
 
 public class ProhibitionContract extends Contract {
-	private Event event;
-	private int n_seconds;
+	private final Event event;
+	private final int n_seconds;
 	
 	public ProhibitionContract(Event event, int n_seconds) {
 		this.event = event;
@@ -9,17 +9,26 @@ public class ProhibitionContract extends Contract {
 	}
 	
 	@Override
-	public void timestep(int n_seconds) {
-		this.n_seconds -= n_seconds;
-		if(this.n_seconds <= 0) {
-			setFulfilled(true);
+	public Contract timestep(int n_seconds) {
+		return new ProhibitionContract(event, 
+				this.n_seconds - n_seconds).syntacticalEq();
+	}
+	
+	@Override
+	public Contract step(Event event) {
+		if(event.equals(this.event)) {
+			return new FalseContract();
+		} else {
+			return this;
 		}
 	}
 	
 	@Override
-	public void step(Event event) {
-		if(event.equals(this.event)) {
-			setViolated(true);
+	public Contract syntacticalEq() {
+		if(n_seconds <= 0) {
+			return new TrueContract();
+		} else {
+			return this;
 		}
 	}
 }

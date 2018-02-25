@@ -5,26 +5,25 @@ public class SequentialContract extends CompositionContract {
 	}
 	
 	@Override 
-	public void timestep(int n_seconds) {
-		if(!lContract.isFulfilled()) {
-			lContract.timestep(n_seconds);
-			this.setViolated(lContract.isViolated());
-		} else {
-			rContract.timestep(n_seconds);
-			this.setViolated(rContract.isViolated());
-			this.setFulfilled(rContract.isFulfilled());
-		}
+	public Contract timestep(int n_seconds) {
+		return new SequentialContract(lContract.timestep(n_seconds),
+				rContract).syntacticalEq();
 	}
 	
 	@Override
-	public void step(Event e) {
-		if(!lContract.isFulfilled()) {
-			lContract.step(e);
-			this.setViolated(lContract.isViolated());
+	public Contract step(Event e) {
+		return new SequentialContract(lContract.step(e),
+				rContract).syntacticalEq();
+	}
+	
+	@Override
+	public Contract syntacticalEq() {
+		if(lContract instanceof TrueContract) { // Rule 9
+			return rContract;
+		} else if (lContract instanceof FalseContract) { // Rule 10
+			return new FalseContract();
 		} else {
-			rContract.step(e);
-			this.setViolated(rContract.isViolated());
-			this.setFulfilled(rContract.isFulfilled());
+			return this;
 		}
 	}
 

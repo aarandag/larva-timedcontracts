@@ -5,26 +5,25 @@ public class ReparationContract extends CompositionContract {
 	}
 	
 	@Override 
-	public void timestep(int n_seconds) {
-		if(!lContract.isViolated()) {
-			lContract.timestep(n_seconds);
-			this.setFulfilled(lContract.isFulfilled());
-		} else {
-			rContract.timestep(n_seconds);
-			this.setViolated(rContract.isViolated());
-			this.setFulfilled(rContract.isFulfilled());
-		}
+	public Contract timestep(int n_seconds) {
+		return new ReparationContract(lContract.timestep(n_seconds),
+				rContract).syntacticalEq();
 	}
 	
 	@Override
-	public void step(Event e) {
-		if(!lContract.isViolated()) {
-			lContract.step(e);
-			this.setFulfilled(lContract.isFulfilled());
+	public Contract step(Event e) {
+		return new ReparationContract(lContract.step(e),
+				rContract).syntacticalEq();
+	}
+	
+	@Override 
+	public Contract syntacticalEq() {
+		if(lContract instanceof TrueContract) { // Rule 11
+			return new TrueContract();
+		} else if (lContract instanceof FalseContract) { // Rule 12
+			return rContract;
 		} else {
-			rContract.step(e);
-			this.setViolated(rContract.isViolated());
-			this.setFulfilled(rContract.isFulfilled());
+			return this;
 		}
 	}
 }
