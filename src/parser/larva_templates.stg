@@ -6,13 +6,15 @@ IMPORTS {
 	import contractModels.*;
 	import exampleBoardingSystem.Passenger; 
 }
-  
+
+	     
 GLOBAL{
 
 VARIABLES{
 	  Clock cl = new DynamicClock();
-	  Contract co = <contract>; 
-	  int timeout = co.timeout();
+	  Contract co = <contract>;
+	  int time_set = System.CurrentTimeMillis();
+	  int time_left = co.timeout() * 1000; /* Time left until next timeout */
 	  }
 
 EVENTS{
@@ -29,8 +31,13 @@ PROPERTY test{
 	}
 	TRANSITIONS{
 	    <events : { event |
-	    starting -> starting [<event.agent>_<event.action> \ !(co.step(new Event("<event.agent>", "<event.action>") instanceof FalseContract) \
-	    	     		  co = co.step(new Event("<event.agent>", "<event.action>"));]
+	    starting -> starting [<event.agent>_<event.action> \ !((co.timestep(time_left - (System.CurrentTimeMillis() - time_set))).step(new Event("<event.agent>", "<event.action>"))) instanceof FalseContract) \
+	    	     		  co = (co.timestep(time_left - (System.CurrentTimeMillis() - time_set))).step(new Event("<event.agent>", "<event.action>"));
+				  time_left = co.timeout() * 1000;
+				  cl.reset();
+				  cl.registerDynamically(time_left);
+				  time_set = System.CurrentTimeMillis();
+				  ]
 	    starting -> bad [<event.agent>_<event.action> \ co.step(new Event("<event.agent>", "<event.action>")) instanceof FalseContract \
 	    	     	    	  co = new FalseContract();]
 				  
@@ -38,8 +45,10 @@ PROPERTY test{
 	    starting -> starting [tick \ !(co.timestep(timeout) instanceof 
 	    	                  FalseContract) \ 
 	    					  co = co.timestep(timeout);
-	    					  timeout = co.timeout();
-	    					  co.registerDynamically(timeout * 1000);
+	    					  time_left = co.timeout() * 1000;
+						  cl.reset();
+	    					  cl.registerDynamically(timeout * 1000);
+						  time_set = System.CurrentTimeMillis();
 	    					  ]
 	    starting -> bad [tick \ co.timestep(timeout) instanceof FalseContract \
 	    				 co = new FalseContract();]
