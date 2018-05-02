@@ -47,7 +47,7 @@ PROPERTY test{
 	    					  co = co.timestep(timeout);
 	    					  time_left = co.timeout() * 1000;
 						  cl.reset();
-	    					  cl.registerDynamically(timeout * 1000);
+	    					  cl.registerDynamically(time_left);
 						  time_set = System.CurrentTimeMillis();
 	    					  ]
 	    starting -> bad [tick \ co.timestep(timeout) instanceof FalseContract \
