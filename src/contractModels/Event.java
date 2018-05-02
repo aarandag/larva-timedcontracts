@@ -12,4 +12,7 @@ public class Event {
 	public boolean equals(Event e) {
 		return e.agent == agent && e.action == action;
 	}
+
+        public String getAgent() { return agent;}
+        public String getAction() { return action;}
 }
