@@ -1,0 +1,15 @@
+*.class
+*.tokens
+*.interp
+output_*.txt
+*.lrv
+*_diag_test.txt
+.project
+.settings
+.classpath
+*~
+
+LatestCode/
+bin/
+aspects/
+larva/
