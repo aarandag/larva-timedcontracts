@@ -14,12 +14,12 @@ public class RecursiveContract extends Contract {
 	}
 	
 	@Override
-	public Contract timestep(int elapsed_seconds) {
-		current_contract = current_contract.timestep(elapsed_seconds);
+	public Contract timestep(long elapsed_milliSeconds) {
+		current_contract = current_contract.timestep(elapsed_milliSeconds);
 		if(current_contract instanceof FalseContract) {
 			return new FalseContract();
 		}
-		current_time -= elapsed_seconds;
+		current_time -= elapsed_milliSeconds;
 		if(current_time <= 0) {
 			current_time += rec_time;
 			current_contract = original_contract;
@@ -38,7 +38,7 @@ public class RecursiveContract extends Contract {
 	}
 	
 	@Override
-	public int timeout() {
+	public long timeout() {
 		return current_contract.timeout();
 	}
 }

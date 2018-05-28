@@ -1,20 +1,20 @@
 package contractModels;
 
 public class WaitContract extends Contract {
-	private final int n_seconds;
+	private final long n_milliSeconds;
 	
-	public WaitContract(int n_seconds) {
-		this.n_seconds = n_seconds;
+	public WaitContract(long n_milliSeconds) {
+		this.n_milliSeconds = n_milliSeconds;
 	}
 	
 	@Override
-	public Contract timestep(int n_seconds) {
-		return new WaitContract(this.n_seconds - n_seconds).syntacticalEq();
+	public Contract timestep(long n_milliSeconds) {
+		return new WaitContract(this.n_milliSeconds - n_milliSeconds).syntacticalEq();
 	}
 	
 	@Override
 	public Contract syntacticalEq() {
-		if(n_seconds <= 0) { // Rule 16
+		if(n_milliSeconds <= 0) { // Rule 16
 			return new TrueContract();
 		} else {
 			return this;
@@ -22,7 +22,7 @@ public class WaitContract extends Contract {
 	}
 	
 	@Override
-	public int timeout() {
-		return n_seconds;
+	public long timeout() {
+		return n_milliSeconds;
 	}
 }

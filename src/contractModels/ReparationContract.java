@@ -6,8 +6,8 @@ public class ReparationContract extends CompositionContract {
 	}
 	
 	@Override 
-	public Contract timestep(int n_seconds) {
-		return new ReparationContract(lContract.timestep(n_seconds),
+	public Contract timestep(long n_milliSeconds) {
+		return new ReparationContract(lContract.timestep(n_milliSeconds),
 				rContract).syntacticalEq();
 	}
 	
@@ -29,7 +29,7 @@ public class ReparationContract extends CompositionContract {
 	}
 	
 	@Override
-	public int timeout() {
+	public long timeout() {
 		return lContract.timeout();
 	}
 }

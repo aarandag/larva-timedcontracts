@@ -1,5 +1,5 @@
 package contractModels;
 
 public interface Constants {
-	public static final int pInf = 999999;
+	public static final long pInf = 999999;
 }

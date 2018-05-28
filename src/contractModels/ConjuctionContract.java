@@ -6,9 +6,9 @@ public class ConjuctionContract extends CompositionContract {
 	} 
 	
 	@Override
-	public Contract timestep(int elapsed_seconds) {
-		return new ConjuctionContract(lContract.timestep(elapsed_seconds),
-				rContract.timestep(elapsed_seconds)).syntacticalEq();
+	public Contract timestep(long elapsed_milliSeconds) {
+		return new ConjuctionContract(lContract.timestep(elapsed_milliSeconds),
+				rContract.timestep(elapsed_milliSeconds)).syntacticalEq();
 	}
 	
 	@Override
@@ -33,7 +33,7 @@ public class ConjuctionContract extends CompositionContract {
 	}
 	
 	@Override
-	public int timeout() {
+	public long timeout() {
 		return Math.min(lContract.timeout(), rContract.timeout());
 	}
 }
