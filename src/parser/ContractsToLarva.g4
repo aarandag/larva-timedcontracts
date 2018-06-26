@@ -37,7 +37,7 @@ SAT {$def = "new TrueContract()";}
 | l=contract AND r=contract {$def = "new ConjuctionContract(" + $l.def + "," + $r.def + ")";}  
 | l=contract OR r=contract {$def = "new DisjuctionContract(" + $l.def + "," + $r.def + ")";}  
 | l=contract REPOP r=contract {$def = "new ReparationContract(" + $l.def + "," + $r.def + ")";}  
-| REC INT DOT contract {$def = "new RecursiveContract(" + $INT.text + ", " + $contract.def + ")";};
+| REC contract CPARE {$def = "new RecursiveContract(" + $contract.def + ")";};
 
 // Define tokens
 SAT : 'sat';
