@@ -43,7 +43,7 @@ SAT {$def = "new TrueContract()";}
 SAT : 'sat';
 VIO : 'vio';
 WAIT : 'wait';
-REC : 'rec';
+REC : 'rec(';
 AND : '&';
 OR : '|';
 SEQOP : ';';
