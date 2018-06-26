@@ -1,0 +1,550 @@
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amssymb,amsmath}
+\usepackage{mathpartir}
+\usepackage{latexsym}
+\usepackage{stmaryrd}
+\usepackage{semantic}
+\usepackage{graphicx}
+\usepackage{eurosym}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{centernot}
+\usepackage{tikz}
+\usepackage{pgffor}
+\usepackage{enumerate}
+
+
+\newcommand{\currbreakcontract}[2]{\text{break}_0(#1,#2)}
+\newcommand{\currdangerofbreakingcontract}[2]{\text{endanger}_0(#1,#2)}
+\newcommand{\breakcontract}[2]{\text{break}(#1,#2)}
+\newcommand{\dangerofbreakingcontract}[2]{\text{endanger}(#1,#2)}
+
+%\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+%\newenvironment{proof}{%
+%  \upshape\begin{list}{}
+%    \item \emph{Proof.}
+%}%
+%{\end{list}}
+
+%\makeatletter
+\usetikzlibrary{calc,automata,shapes.multipart, positioning, shapes.arrows,positioning,calc,trees}
+\tikzset{
+  state new/.style={circle, draw, align=center},
+%  state/.style={circle mio, draw, text width=0.3cm, align=center},
+  state/.style={circle, draw, align=center},
+  line/.style = {->,>=stealth,line width=0.4pt, shorten <=1mm, shorten >=1mm},
+  line over/.style = {preaction={draw=white, -,line width=3pt}, line},
+  shortcut/.style = {line, dashed},
+  every edge/.append style={line},
+  conode/.style={rectangle split, 
+    rectangle split horizontal, 
+    rectangle split parts=3,draw},
+  cotree/.style={fill,
+    edge from parent path={(\tikzparentnode\tikzparentanchor) 
+      -- +(0em,-0.5\tikzleveldistance) 
+      node[pos=1,circle,inner sep=0pt,minimum
+      size=4pt,fill,fill=white, draw]{}
+      [->, >=stealth, rounded corners=2pt] -| 
+      (\tikzchildnode\tikzchildanchor)}
+  },
+  coagent/.style={inner sep=1pt, anchor=south west},
+  coname/.style={inner sep=1pt, anchor=north east}
+}
+
+\pgfdeclareshape{circle mio}
+{
+  %
+  % Node parts
+  %
+  \nodeparts{text,lower}
+
+  %
+  % Anchors
+  %
+  \savedanchor\centerpoint{%
+    \pgf@x=.5\wd\pgfnodeparttextbox%
+    \pgfmathsetlength{\pgf@y}{\pgfkeysvalueof{/pgf/inner ysep}}%
+    \pgf@y=-\pgf@y%
+    \advance\pgf@y by-\dp\pgfnodeparttextbox%
+    \advance\pgf@y by-.5\pgflinewidth%
+  }%
+  \savedanchor\loweranchor{%
+    \pgf@x=-.5\wd\pgfnodepartlowerbox%
+    \advance\pgf@x by.5\wd\pgfnodeparttextbox%
+    \pgfmathsetlength{\pgf@y}{\pgfkeysvalueof{/pgf/inner ysep}}%
+    \pgf@y=-2\pgf@y%
+    \advance\pgf@y by-\ht\pgfnodepartlowerbox%
+    \advance\pgf@y by-.5\pgflinewidth%
+    \advance\pgf@y by-\dp\pgfnodeparttextbox%
+    \advance\pgf@y by-.5\pgflinewidth%
+  }
+    
+  \saveddimen\radius{%
+    % 
+    % Caculate ``height radius''
+    %
+    %\pgf@ya=.5\ht\pgfnodeparttextbox%
+%    \advance\pgf@ya by.5\dp\pgfnodeparttextbox%
+%    \advance\pgf@ya by.5\ht\pgfnodepartlowerbox%
+%    \advance\pgf@ya by.5\dp\pgfnodepartlowerbox%
+%    \advance\pgf@ya by.5\pgflinewidth%
+                %
+                % MW: Suggested correction for above calculation:       Use the tallest box * 2.
+                %
+                \pgf@ya=.5\ht\pgfnodeparttextbox%
+                \advance\pgf@ya by.5\dp\pgfnodeparttextbox%
+                \pgf@yb=.5\ht\pgfnodepartlowerbox%
+                \advance\pgf@yb by.5\dp\pgfnodepartlowerbox%
+                \ifdim\pgf@ya>\pgf@yb\relax%
+                        \pgf@ya2.0\pgf@ya\relax%
+                \else%
+                        \pgf@ya2.0\pgf@yb\relax%
+                \fi%
+                \advance\pgf@ya by.5\pgflinewidth%
+    \pgfmathsetlength\pgf@yb{\pgfkeysvalueof{/pgf/inner ysep}}%
+    \advance\pgf@ya by2\pgf@yb%
+    % 
+    % Caculate ``width radius''
+    % 
+    \pgf@xa=.5\wd\pgfnodeparttextbox%
+    \ifdim\pgf@xa<.5\wd\pgfnodepartlowerbox%
+      \pgf@xa=.5\wd\pgfnodepartlowerbox%
+    \fi%
+    \pgfmathsetlength\pgf@xb{\pgfkeysvalueof{/pgf/inner xsep}}%
+    \advance\pgf@xa by\pgf@xb%
+    % 
+    % Calculate length of radius vector:
+    % 
+    \pgf@process{\pgfpointnormalised{\pgfqpoint{\pgf@xa}{\pgf@ya}}}%
+    \ifdim\pgf@x>\pgf@y%
+        \c@pgf@counta=\pgf@x%
+        \ifnum\c@pgf@counta=0\relax%
+        \else%
+          \divide\c@pgf@counta by 255\relax%
+          \pgf@xa=16\pgf@xa\relax%
+          \divide\pgf@xa by\c@pgf@counta%
+          \pgf@xa=16\pgf@xa\relax%
+        \fi%
+      \else%
+        \c@pgf@counta=\pgf@y%
+        \ifnum\c@pgf@counta=0\relax%
+        \else%
+          \divide\c@pgf@counta by 255\relax%
+          \pgf@ya=16\pgf@ya\relax%
+          \divide\pgf@ya by\c@pgf@counta%
+          \pgf@xa=16\pgf@ya\relax%
+        \fi%
+    \fi%
+    \pgf@x=\pgf@xa%
+    % 
+    % If necessary, adjust radius so that the size requirements are
+    % met: 
+    % 
+    \pgfmathsetlength{\pgf@xb}{\pgfkeysvalueof{/pgf/minimum width}}%  
+    \pgfmathsetlength{\pgf@yb}{\pgfkeysvalueof{/pgf/minimum height}}%  
+    \ifdim\pgf@x<.5\pgf@xb%
+        \pgf@x=.5\pgf@xb%
+    \fi%
+    \ifdim\pgf@x<.5\pgf@yb%
+        \pgf@x=.5\pgf@yb%
+    \fi%
+    % 
+    % Now, add larger of outer sepearations.
+    % 
+    \pgfmathsetlength{\pgf@xb}{\pgfkeysvalueof{/pgf/outer xsep}}%  
+    \pgfmathsetlength{\pgf@yb}{\pgfkeysvalueof{/pgf/outer ysep}}%  
+    \ifdim\pgf@xb<\pgf@yb%
+      \advance\pgf@x by\pgf@yb%
+    \else%
+      \advance\pgf@x by\pgf@xb%
+    \fi%
+  }
+
+  %
+  % Anchors
+  % 
+  \inheritanchorborder[from=circle]
+  \inheritanchor[from=circle]{north}
+  \inheritanchor[from=circle]{north west}
+  \inheritanchor[from=circle]{north east}
+  \inheritanchor[from=circle]{center}
+  \inheritanchor[from=circle]{west}
+  \inheritanchor[from=circle]{east}
+  \inheritanchor[from=circle]{mid}
+  \inheritanchor[from=circle]{mid west}
+  \inheritanchor[from=circle]{mid east}
+  \inheritanchor[from=circle]{base}
+  \inheritanchor[from=circle]{base west}
+  \inheritanchor[from=circle]{base east}
+  \inheritanchor[from=circle]{south}
+  \inheritanchor[from=circle]{south west}
+  \inheritanchor[from=circle]{south east}
+  \anchor{lower}{\loweranchor}
+
+  %
+  % Background path
+  %
+  \inheritbackgroundpath[from=circle]
+  \beforebackgroundpath{
+    \pgfutil@tempdima=\radius%
+    \pgfmathsetlength{\pgf@xb}{\pgfkeysvalueof{/pgf/outer xsep}}%  
+    \pgfmathsetlength{\pgf@yb}{\pgfkeysvalueof{/pgf/outer ysep}}%  
+    \ifdim\pgf@xb<\pgf@yb%
+      \advance\pgfutil@tempdima by-\pgf@yb%
+    \else%
+      \advance\pgfutil@tempdima by-\pgf@xb%
+    \fi%
+    \advance\pgfutil@tempdima by-.5\pgflinewidth%  
+    \pgfsetshortenstart{0pt}%
+    \pgfsetshortenend{0pt}%
+    \pgfsetarrows{-}%  
+    \pgfpathmoveto{\pgfpointadd{\centerpoint}{\pgfqpoint{-0.8\pgfutil@tempdima}{0pt}}}%
+    \pgfpathlineto{\pgfpointadd{\centerpoint}{\pgfqpoint{0.8\pgfutil@tempdima}{0pt}}}%
+    \pgfusepath{stroke}%
+  }
+}
+
+
+\newcommand{\conode}[3]{#1\nodepart{two}#2\nodepart{three}#3}
+\newcommand{\stcond}[2]{#1\nodepart{lower}#2}
+
+
+\newcommand{\true}{\ensuremath{\mathit{tt}}}
+\newcommand{\false}{\ensuremath{\mathit{ff}}}
+\newcommand{\tracelength}[1]{\##1}
+
+
+\newcommand{\augmented}[1]{#1_{\mbox{\footnotesize cond\normalsize}}}
+\newcommand{\concat}{+\!\!+}
+\newcommand{\st}{\;\cdot\;}
+\newcommand{\df}{\stackrel{\mbox{\footnotesize df\normalsize}}{=}}
+\newcommand{\subsumed}{\stackrel{\mbox{\tiny$\Leftarrow$\normalsize}}{=}}
+\newcommand{\normalform}{\mbox{nf}}
+\newcommand{\QQ}{{\mathcal Q}}
+\newcommand{\prA}{\mathcal{A}}
+\newcommand{\refinedby}[2]{\sqsubseteq_{\mbox{\footnotesize\emph{#1}}}^#2}
+
+\newcommand{\refinedbyMustV}{\refinedby{must}{v}}
+\newcommand{\refinedbyMayV}{\refinedby{may}{v}}
+
+\newcommand{\refinedbyMustD}{\refinedby{must}{d}}
+\newcommand{\refinedbyMayD}{\refinedby{may}{d}}
+
+\newcommand{\mustviolatetraces}{\mbox{traces}_{\mbox{{\footnotesize must}}}^v}
+\newcommand{\mayviolatetraces}{\mbox{traces}_{\mbox{{\footnotesize may}}}^v}
+
+\newcommand{\mustdangertraces}{\mbox{traces}_{\mbox{{\footnotesize must}}}^d}
+\newcommand{\maydangertraces}{\mbox{traces}_{\mbox{{\footnotesize may}}}^d}
+
+
+\def\squareforqed{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+\def\qed{%
+     \ifhmode%
+        \unskip\nobreak\hfil%
+        \penalty50\hskip1em\null\nobreak\hfil\squareforqed%
+        \parfillskip=0pt\finalhyphendemerits=0\endgraf%
+     \else%
+       % \nopagebreak[4]%
+       % \leavevmode\nobreak\hfill\squareforqed%
+       \kern-1em\samepage\leavevmode\hfill\squareforqed%
+   \fi}
+
+% \newtheorem{mytheorem}{Theorem}
+% \newtheorem{mydefinition}{Definition}
+% \newtheorem{myexample}{Example}
+% \newtheorem{mylemma}{Lemma}
+% \newtheorem{myproposition}{Proposition}
+% \newtheorem{mycorollary}{Corollary}
+%\newenvironment{proof}{\par\textit{Proof.}\ }{}
+
+% \makeatletter
+% \let\old@proposition\proposition
+% \let\old@endproposition\endproposition
+% \renewenvironment{proposition}{\old@proposition\upshape}{\qed\old@endproposition}
+% \let\old@theorem\theorem
+% \let\old@endtheorem\endtheorem
+% \renewenvironment{theorem}{\old@theorem\upshape}{\qed\old@endtheorem}
+% \let\old@definition\definition
+
+% \let\old@enddefinition\enddefinition
+% \renewenvironment{definition}{\old@definition\upshape}{\qed\old@enddefinition}
+% \let\old@lemma\lemma
+% \let\old@endlemma\endlemma
+% \renewenvironment{lemma}{\old@lemma\upshape}{\qed\old@endlemma}
+% \let\old@corollary\corollary
+% \let\old@endcorollary\endcorollary
+% \renewenvironment{corollary}{\old@corollary\upshape}{\qed\old@endcorollary}
+% \newenvironment{proofappendix}[2]{
+%   \noindent\textit{\textbf{Proof of #1~\ref{#2}}}\\
+% }{\qed}
+% \let\old@example\example
+% \let\old@endexample\endexample
+% \renewenvironment{example}{\old@example}{\old@endexample\qed}
+
+%\newenvironment{theorem}{\begin{mytheorem}\upshape}{\qed\end{mytheorem}}
+%\newenvironment{definition}{\begin{mydefinition}\upshape}{\qed\end{mydefinition}}
+%\newenvironment{lemma}{\begin{mylemma}\upshape}{\qed\end{mylemma}}
+%\newenvironment{proposition}{\begin{myproposition}\upshape}{\qed\end{myproposition}}
+%\newenvironment{corollary}{\begin{mycorollary}\upshape}{\qed\end{mycorollary}}
+%\newenvironment{example}{\begin{myexample}\upshape}{\qed\end{myexample}}
+\makeatother
+
+
+\DeclareMathSymbol\gusano{\mathrel}{lasy}{"3A}
+
+\newbox\arriba
+\newbox\abajo
+\newbox\CaracterInterno
+\newbox\CaracterDerecha
+\newdimen\anchura
+\def\MacrosTranGeneral#1#2#3#4#5#6{%
+  \setbox\CaracterInterno=\hbox{\mathsurround=0pt$\mathord#4$}
+  \setbox\CaracterDerecha=\hbox{\mathsurround=0pt$\mathord#3$}
+  \setbox\arriba=\hbox{$#1#2$}
+  \setbox\abajo=\hbox{\mathsurround=0pt%
+                      \anchura=\wd\arriba%
+                      \advance \anchura by 0.5em%
+                      \divide \anchura by \wd\CaracterInterno%
+                      \multiply \anchura by \wd\CaracterInterno%
+                      \copy\CaracterInterno\kern\SeparacionInternaFlecha
+                      \hbox to \anchura{%
+                          $\cleaders%
+                            \hbox{\kern\SeparacionInternaFlecha\copy\CaracterInterno}
+                            \hfill$}%
+                      \kern\SeparacionExternaFlecha\copy\CaracterDerecha}
+  \mathrel{{\buildrel\vbox{\copy\arriba \kern\SeparacionFlechaArriba} %
+    \over{\copy\abajo^{#6}}}_{#5}}
+  }
+\def\MacrosTranGeneralProp#1#2#3#4#5{\mathchoice%
+  {\MacrosTranGeneral{\scriptstyle}{#1}{#2}{#3}{#4}{#5}}
+  {\MacrosTranGeneral{\scriptstyle}{#1}{#2}{#3}{#4}{#5}}
+  {\MacrosTranGeneral{\scriptscriptstyle}{#1}{#2}{#3}{#4}{#5}}
+  {\MacrosTranGeneral{\scriptscriptstyle}{#1}{#2}{#3}{#4}{#5}}}
+
+\def\MacrosTran#1{%
+  \def\SeparacionInternaFlecha{-0.3em}%
+  \def\SeparacionExternaFlecha{-0.5em}%
+  \def\SeparacionFlechaArriba{-3pt}%
+  \MacrosTranGeneralProp{#1}{{\rightarrow}}{{-}}{}{}}
+\def\MacrosNoTran#1{%
+  \def\SeparacionInternaFlecha{-0.3em}
+  \def\SeparacionExternaFlecha{-0.5em}
+  \def\SeparacionFlechaArriba{-3pt}
+  \MacrosTranGeneralProp{#1\kern 0.5em}{{\not\rightarrow}}{{-}}{}{}}
+\def\MacrosVTran#1{%
+  \def\SeparacionInternaFlecha{-0.2em}
+  \def\SeparacionExternaFlecha{-0.5em}
+  \def\SeparacionFlechaArriba{0pt}
+  \MacrosTranGeneralProp{#1}{{\Rightarrow}}{{=}}{}{}}
+\def\MacrosNoVTran#1{%
+  \def\SeparacionInternaFlecha{-0.2em}
+  \def\SeparacionExternaFlecha{-0.5em}
+  \def\SeparacionFlechaArriba{-3pt}
+  \MacrosNoTranGeneralProp{#1}{{\not\Rightarrow}}{{=}}{}{}}
+\def\MacrosTiTran#1{%
+  \def\SeparacionInternaFlecha{-0.0pt}
+        \def\SeparacionExternaFlecha{-0.0pt}
+        \def\SeparacionFlechaArriba{0pt}
+  \kern 1pt\MacrosTranGeneralProp{#1}{{\leadsto}}{{\gusano}}{}{}}
+\def\MacrosTiTranRe#1{%
+  \def\SeparacionInternaFlecha{-0pt}
+        \def\SeparacionExternaFlecha{-0.0pt}
+        \def\SeparacionFlechaArriba{-3pt}
+  \kern 1pt \MacrosTranGeneralProp{#1}{{\leadsto}}{{\gusano}}{}{*}}
+\def\MacrosNoTiTranRe#1{%
+  \def\SeparacionInternaFlecha{-0pt}
+        \def\SeparacionExternaFlecha{-0.0pt}
+        \def\SeparacionFlechaArriba{-3pt}
+  \kern 1pt \MacrosTranGeneralProp{#1}{{\not\leadsto}}{{\gusano}}{}{*}}
+\def\MacrosNoTiTran#1{%
+  \def\SeparacionInternaFlecha{-0pt}
+        \def\SeparacionExternaFlecha{-0.0pt}
+        \def\SeparacionFlechaArriba{-3pt}
+  \kern 1pt \MacrosTranGeneralProp{#1}{{\not\leadsto}}{{\gusano}}{}{}}
+
+
+
+%\def\tran#1{\ensuremath\mathbin{\MacrosTran{#1}}}
+\def\vtran#1{\ensuremath\mathbin{\MacrosVTran{#1}}}
+\def\notran#1{\ensuremath\mathbin{\MacrosNoTran{#1}}}
+\def\novtran#1{\ensuremath\mathbin{\MacrosNoVTran{#1}}}
+\newcommand{\tran}[1]{\MacrosTran{#1}}
+\newcommand{\transys}{\ensuremath\mathbin{\MacrosTiTran{}}}
+\newcommand{\transysre}{\MacrosTiTranRe{}}
+\newcommand{\notranti}[1]{\MacrosNoTiTran{#1}}
+\newcommand{\notrantire}[1]{\MacrosNoTiTranRe{#1}}
+
+
+%% For iocos stuff.
+\newcommand{\mIUT}{\ensuremath{\mathrm{IUT}_m}}
+\newcommand{\Onodelta}{\ensuremath{O_{\not\delta}}}
+
+\newcommand{\tranp}[2]{\MacrosTran{#1}_{\!\!#2}\;}
+\newcommand{\tranap}[2]{\MacrosVTran{#1}_{\!\!#2}\;}
+\newcommand{\tranb}[2]{\stackrel{#1}{\Longrightarrow}_{#2}}
+\newcommand{\transi}[2]{\MacrosTran{#1}_{\!\!#2}\;}
+\newcommand{\iocos}{\ensuremath{\mathbin{\mathsf{ioco\underline{s} }}}}
+\newcommand{\giocos}{\ensuremath{\mathbin{\mathsf{g\mbox{-}ioco\underline{s} }}}}
+\newcommand{\niocos}{\ensuremath{\mathbin{\kern 1em\hbox to 0pt{/\hss}\kern-1em \mathsf{ioco\underline{s}}}}}
+%\newcommand{\iocoqs}{\mathbin{\mathbf{iocoqs}}}
+\newcommand{\ioco}{\ensuremath{\mathbin{\mathsf{ioco}}}}
+\newcommand{\nioco}{\ensuremath{\mathbin{\kern 1em\hbox to 0pt{/\hss}\kern-1em \mathsf{ioco}}}}
+\newcommand{\IOTS}{\ensuremath{\mathit{IOTS}}}
+\newcommand{\LTS}{\ensuremath{\mathit{LTS}}}
+\newcommand{\LTSs}{\ensuremath{\mathit{LTSs}}}
+\newcommand{\Lts}{\ensuremath{{\cal L}}}
+\newcommand{\after}{\mathbin{\mathsf{after}}}
+\newcommand{\partes}{\ensuremath{{\cal P}}}
+% \newcommand{\success}{\hbox{\blacksmiley}}
+% \newcommand{\fail}{\hbox{\frownie}}
+% \newcommand{\success}{\hbox{\Checkmark}}
+% \newcommand{\fail}{\hbox{\XSolidBrush}}
+% \newcommand{\success}{\checkmark}
+% \newcommand{\fail}{\hbox{X}}
+\newcommand{\success}{\hbox{\fontsize{8}{10}\selectfont\Checkmark}}
+\newcommand{\fail}{\lower2pt\hbox{\fontsize{8}{10}\selectfont\XSolidBrush}}
+
+\newcommand{\pass}{\mathbin{\mathsf{pass}}}
+\newcommand{\nopass}{\mathbin{\kern1em\hbox to 0pt{/\hss}\kern-1em \mathsf{pass}}}
+\renewcommand{\emptyset}{\varnothing}
+
+%\renewcommand{\after}{\mathbin{~\mathsf{after}~}}
+\newcommand{\traces}{\mathsf{traces}}
+\newcommand{\Straces}{\mathit{Straces}}
+\newcommand{\outs}{\mathsf{outs}}
+\newcommand{\ins}{\mathsf{ins}}
+\newcommand{\init}{\mathsf{init}}
+
+%% General commands
+
+\newcommand{\comen}[1]{}
+%\newcommand{\nota}[1]{\textbf{#1}}
+
+
+\newcommand{\tests}{\ensuremath{\mathit{{\cal T}}}}
+\newcommand{\vtests}{\ensuremath{\mathit{{\cal T}}_v}}
+\newcommand{\ltest}{\ensuremath{\mathbin{\sqsubseteq_T}}}
+\newcommand{\noltest}{\ensuremath{\mathbin{\kern0.5em/\kern-1em \sqsubseteq_T}}}
+\newcommand{\testfrom}[1]{{\cal T}(#1)}
+\newcommand{\partini}{\Omega}
+\newcommand{\relini}{\preccurlyeq}
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\calS}{\cal S}
+\newcommand{\recup}{\vartriangleright}
+\newcommand{\fin}{\;\mathsf{in}\;}
+\newcommand{\vc}{\mathsf{vc}}
+\newcommand{\ic}{\mathsf{ic}}
+\newcommand{\paral}{\mathbin{\|}}
+\newcommand{\choice}{\mathbin{\square}}
+\newcommand{\ichoice}{\mathbin{\sqcap}}
+\newcommand{\rec}{\mathsf{rec\;}}
+%\newcommand{\dotminus}{\mathbin{\vbox{\hbox{.}\kern-0.8em\hbox{-}}}}
+\newcommand{\dotminus}{\mathbin{\vbox{\hbox to 1em{\hfill$.$\hfill}\kern-0.8em\hbox to 1em{\hfill$-$\hfill}}}}
+\newcommand{\act}{\mathsf{Act}}
+\newcommand{\acttau}{\act_\tau}
+\newcommand{\timedomain}{{\cal T}}
+\newcommand{\agentset}{\ensuremath{{\cal AG}}}
+\newcommand{\lsim}{\lesssim}
+\newcommand{\cent}{c}
+\newcommand{\pr}{\mathsf{P_r}}
+\newcommand{\ob}{\mathsf{O_b}}
+\newcommand{\fb}{\mathsf{F_b}}
+\newcommand{\regla}[1]{\ensuremath{\textsf{#1}}}
+\newcommand{\var}{\mathsf{Var}}
+\newcommand{\wait}{\mathsf{Wait}}
+\newcommand{\sync}[1]{\overline{#1}}
+\makeatletter
+\def\@inferenceFrontName[#1]{%
+  \setbox3=\hbox{\textsf{\footnotesize #1}}%
+  \ifdim \wd3 > \z@
+    \unhbox3%
+    \hskip\@@nSpace
+  \fi
+  \@inferenceMiddle
+}
+
+\def\sat{\vdash}
+\def\violate#1{\vdash_{\mathit{v#1}}}
+\def\violmay{\violate{may}}
+\def\violmust{\violate{must}}
+
+\newcommand{\oo}[2]{{\mathcal{O}_{#1}(#2)}}
+\newcommand{\ou}[4]{{\mathcal{O}_{#1}(#2){\cal U}[#4,#3]}}
+\newcommand{\ff}[2]{{\mathcal{F}_{#1}(#2)}}
+\newcommand{\fu}[4]{{\mathcal{F}_{#1}(#2){\cal U}[#4,#3]}}
+\newcommand{\pp}[2]{{\mathcal{P}_{#1}(#2)}}
+
+\newcommand{\processes}[1]{\|_{i\in I} #1_i}
+\newcommand{\Aprocesses}{{\mathcal A}}
+\newcommand{\transition}[2]{\xrightarrow{#1,\;\{#2\}}}
+\newcommand{\notransition}[2]{\centernot{\transition{#1}{#2}}}
+\newcommand{\system}[2]{\langle #1,\;#2\rangle}
+
+\newcommand{\name}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand{\rulenamed}[3]{\name{#1}\ \frac{#2}{#3}}
+
+\let\oldphi\phi
+\def\phi{\varphi}
+%\def\genrec{\mathbin{\hbox to 0pt{$\cdot$\hss}\triangleright}}
+\def\genrec{\ogreaterthan}
+\def\dangerrec{\triangleright}
+\def\violationrec{\blacktriangleright}
+\def\violation{\mathsf{violation}}
+\def\danger{\mathsf{danger}}
+
+\def\calA{{\cal A}}
+\def\calI{{\cal I}}
+\def\calC{{\cal C}}
+\def\calP{{\cal P}}
+\newcommand\mor{\vee}
+\newcommand\mand{\wedge}
+\def\implies{\longrightarrow}
+\makeatother
+
+\newcommand{\dval}{\mathbin{\vdash_{\kern -0.3em d}}}
+\newcommand{\vval}{\mathbin{\vdash_{\kern -0.3em v}}}
+\newcommand{\vio}{\mathsf{vio}}
+\newcommand{\dan}{\mathsf{dan}}
+\newcommand{\cset}{\calC}
+\newcommand{\pred}{\calP}
+\newcommand{\tolerant}{\mathbin{\preccurlyeq}}
+\newcommand{\cequiv}{\backsim}
+\makeatother
+\newcommand{\ci}{\ensuremath{\mathtt{checkin}}}
+\newcommand{\landing}{\ensuremath{\mathtt{landing}}}
+\newcommand{\boarding}{\ensuremath{\mathtt{boarding}}}
+
+\newcommand{\pbp}{\ensuremath{\mathtt{PBP}}}
+\newcommand{\gbch}{\ensuremath{\mathtt{GBCh}}}
+\newcommand{\shp}{\ensuremath{\mathtt{ShP}}}
+\newcommand{\weapon}{\ensuremath{\mathtt{weapon}}}
+\newcommand{\board}{\ensuremath{\mathtt{board}}}
+\newcommand{\liq}{\ensuremath{\mathtt{liq}}}
+\newcommand{\hl}{\ensuremath{\mathtt{hl}}}
+\newcommand{\hlhold}{\ensuremath{\mathtt{hlhold}}}
+\newcommand{\dliq}{\ensuremath{\mathtt{dliq}}}
+\newcommand{\cotext}{\fontsize{6}{7}\selectfont}
+\newcommand{\coand}{\cotext \textsf{AND}}
+\newcommand{\coseq}{\cotext \textsf{SEQ}}
+\newcommand{\only}[1]{\mathsf{only(#1)}}
+\newcommand{\cond}[3]{[#1](#2,#3)}
+\newcommand{\until}[2]{#1\ {\cal U}[#2]}
+
+%\newtheorem{corollary}{Corollary}
+
+\newcommand{\calD}{{\mathcal D}}
+\newcommand{\closure}[1]{\textit{closure}(#1)}
+\newcommand{\fulltran}[1]{\tran{#1}\!_{\textit{full}}\;}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main.tex"
+%%% End:

@@ -1,0 +1,71 @@
+\documentclass{article}
+\input{macros}
+\begin{document}
+\section{Introduction}
+
+The objective of this tool is to translate a given timed contract to a Larva specification. This specification can be used to generate AspectJ code which, once weaved in a Java system, can be used to perform runtime verification on it.
+
+Figure 1 shows a usage flow example of the tool and the output provided by it.
+
+\begin{figure}[hp]
+  \centering
+  \includegraphics[scale=0.5]{Larva-rt-tutorial.png}
+\end{figure}
+
+The role of the tool, highlighted in green, is the translation from a Contract Specification to a Larva Specification. The latter defines a DATE consisting of two states: an initial one, and a bad one, which the system reaches whenever the contract is violated.
+
+The result is, therefore, an AspectJ monitoring code, which can be used to verify in runtime if a contract is respected in a system.
+
+\section{Contract Calculus}
+
+The language in which the contract are specified is based on the one explained in [0]. The paper specifies the set of valid formulae, along with its semanics.
+
+A contract defines what actions a certain agent is allowed, obligated, or forbidden to do within a specific amount of time. It can also be a conjuction or disjuction of contract, a sequential contract (the first contract must be enforced, then the second), a reparation contract (if the first contract is violated, the second must be enforced), a recursive contract (the contract must be enforced each given amount of time), a wait contract, or the trivially satisfied and violated ones.
+
+In the implementation, each agent will correspond to a Java class, while actions will correspond to method calls. Time is expressed in milliseconds.
+
+Table 1 shows an equivalence between each of the symbols of the language defined in the paper and the language that the tool will take as input.
+
+\begin{table}[hp]
+\centering
+\caption{Equivalence table}
+\label{my-label}
+\begin{tabular}{|l|l|l|}
+ Symbol in the paper & Symbol in the implementation & Semantics \\ \hline
+ $\top$ & sat & Trivially satisfied                                    \\
+ $\bot$ & vio & Trivially violated                                    \\
+ wait(d) & wait[d] & Wait \textit{d} milliseconds                                   \\
+ rec & rec($\phi$) & Recursion (enforce $\phi$ repeatedly)        \\
+ $\wedge$ & \& & Conjuction                                     \\
+ $\vee$ & $|$  & Disjuction                                     \\
+; & ; & Sequential                                      \\
+  $\violationrec$ & $>>$ & Reparation            \\
+  $\ff{k}{a}[d]$  & F(a $->$ k){[}d{]} & Prohibition \\
+  $\pp{k}{a}[d]$  & P(a $->$ k){[}d{]} & Permission (not implemented) \\
+  $\oo{k}{a}[d]$  & O(a $->$ k){[}d{]} & Obligation \\
+                                         
+\end{tabular}
+\end{table}
+
+Note that the paper defines a conditional contract which is not implemented yet. The permission contract is not implemented, neither.
+
+In order to clarify the syntax of the strings that the tool takes as input, we will adapt some contract examples from the paper. Below, we present how four different contracts would be written, both in the notation used in the paper and the one that the tool takes as input.
+
+\small
+    $\phi_0 ::= \pp{p}{\ci}[200]$\\
+    P(p -> checkin)[200] \\
+    $\phi_1 ::= \oo{p}{\pbp}[500]\violationrec \oo{p}{\gbch}[300]$\\
+    O(p -> PBP)[500] >> O(p -> GBCh[300] \\
+    $\phi_2 ::= \oo{p}{\shp}[800]$\\
+    O(p -> ShP)[800] \\
+    $\phi_3  ::= 
+        (\ff{p}{\weapon}[900]) \wedge \\
+            (\ff{p}{\liq}[800] \violationrec \oo{p}{\dliq}[800])$\\
+    F(p -> weapon)[900] \& (F(p -> liq)[800] >> O(p -> dliq)[800]) \\ 
+    $\phi_4 ::= (\pp{p}{\board}[200] ; \pp{p}{\hl}[500]) \violationrec (\oo{c}{\board}[200]) \\ (P(p -> board)[200] ; P(p -> hl)[500]) >> O(c -> board)[200]$
+    \\
+\normalsize
+
+
+\section{How to use}
+\end{document}
