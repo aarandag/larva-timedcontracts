@@ -26,11 +26,11 @@ SAT {$def = "new TrueContract()";}
 | PCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {/* PermissionContract : Not implemented */}
 | OCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {
     l_events.add(new Event($k.text, $a.text));
-    $def = "new ObligationContract(new Event(" + $k.text + ", " + $a.text + "), " + $INT.text + ")";
+    $def = "new ObligationContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"), " + $INT.text + ")";
 }
 | FCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {
     l_events.add(new Event($k.text, $a.text)); 
-    $def = "new ProhibitionContract(new Event(" + $k.text + ", " + $a.text + "), " + $INT.text + ")";
+    $def = "new ProhibitionContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"), " + $INT.text + ")";
 }
 | WAIT OBRACK INT CBRACK {$def = "new WaitContract(" + $INT.text + ")";}
 | l=contract SEQOP r=contract {$def = "new SequentialContract(" + $l.def + "," + $r.def + ")";}  
