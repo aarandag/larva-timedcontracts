@@ -1,0 +1,74 @@
+automaton_definition(contract, events) ::=
+
+<<
+
+IMPORTS {
+	import contractModels.*;
+	import exampleBoardingSystem.Passenger; 
+}
+ 
+GLOBAL{
+
+VARIABLES{
+	  Clock cl = new DynamicClock();
+	  Contract co = <contract>;
+	  long time_set = System.currentTimeMillis();
+	  boolean initializing = true;
+	  }
+
+EVENTS{
+    tick() = {cl@@}
+    <events : { event |
+    <event.agent>_<event.action>(<event.agent> agent) = {agent.<event.action>()\}
+    }>
+}
+
+PROPERTY test{
+	 STATES{
+		BAD{bad}
+		STARTING{starting {
+				if(initializing) {
+					updateClock();
+					initializing = false;
+				}
+			}
+		}
+	}
+	TRANSITIONS{
+	    <events : { event |
+	    starting -> starting [<event.agent>_<event.action> \ !((co.timestep(System.currentTimeMillis() - time_set)).step(new Event("<event.agent>", "<event.action>")) instanceof FalseContract) \
+	    	     		  co = (co.timestep(System.currentTimeMillis() - time_set)).step(new Event("<event.agent>", "<event.action>"));
+				  updateClock();
+				  ]
+	    starting -> bad [<event.agent>_<event.action> \ (co.timestep(System.currentTimeMillis() - time_set)).step(new Event("<event.agent>", "<event.action>")) instanceof FalseContract \
+	    	     	    	  co = new FalseContract();
+				  System.out.println("Contract violated after agent <event.agent> performed action <event.action> after " + String.valueOf(System.currentTimeMillis() - time_set) + " ms");]
+				  
+	    }>
+	    starting -> starting [tick \ !(co.timestep(System.currentTimeMillis() - time_set) instanceof 
+	    	                  FalseContract) \ 
+	    			  co = co.timestep(System.currentTimeMillis() - time_set);						 
+				  updateClock(); 
+	    			  ]
+	    starting -> bad [tick \ co.timestep(System.currentTimeMillis() - time_set) instanceof FalseContract \
+	    		    	  co = new FalseContract();
+				  System.out.println("Contract violated after a timeout of " + String.valueOf(System.currentTimeMillis() - time_set) + " ms");]
+	    
+	    	 				    
+        }
+}
+
+}
+
+
+METHODS {
+	void updateClock() {
+	     cl.reset();
+	     cl.registerDynamically(co.timeout());
+	     time_set = System.currentTimeMillis();
+	}
+	     
+}
+
+
+>>
