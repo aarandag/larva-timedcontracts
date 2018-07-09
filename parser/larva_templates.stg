@@ -42,7 +42,7 @@ PROPERTY test{
 				  ]
 	    starting -> bad [<event.agent>_<event.action> \ (co.timestep(System.currentTimeMillis() - time_set)).step(new Event("<event.agent>", "<event.action>")) instanceof FalseContract \
 	    	     	    	  co = new FalseContract();
-				  System.out.println("Contract violated after agent <event.agent> performed action <event.action> after " + String.valueOf(System.currentTimeMillis() - time_set) + " ms");]
+				  System.out.println("Contract violated after agent <event.agent> performed action <event.action> after " + String.valueOf(System.currentTimeMillis() - time_set) + " ms of timeout");]
 				  
 	    }>
 	    starting -> starting [tick \ !(co.timestep(System.currentTimeMillis() - time_set) instanceof 
