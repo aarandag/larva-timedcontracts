@@ -10,11 +10,11 @@ public class Passenger {
 		
 	}
 	
-	public void gbch() {
+	public void GBCh() {
 		
 	}
 	
-	public void shp() {
+	public void ShP() {
 		
 	}
 	
@@ -25,4 +25,8 @@ public class Passenger {
 	public void hl() {
 		
 	}
+	
+	public void weapon() {}
+	public void liq() {}
+	public void dliq() {}
 }

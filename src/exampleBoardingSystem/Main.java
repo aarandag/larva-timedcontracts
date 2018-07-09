@@ -1,22 +1,24 @@
 package exampleBoardingSystem;
 import java.util.Random;
 
-public class Main implements Runnable{
+public class Main implements Runnable {
 
-	public void run()
+	public void run() 
 	{
 	    Passenger p = new Passenger();
-	    int count = 0;
-	    while(count < 10) {
-		try {
-		Thread.sleep(100);
-		} catch(Exception ex) {
-		    ex.printStackTrace();
-		}
-		System.out.println("[Main] Check in!");
-		p.checkin();
-		count++;
+
+	    try {
+		Thread.sleep(600);
+		p.GBCh();
+		Thread.sleep(400);
+		p.ShP();
+		Thread.sleep(1000);
+		p.dliq();
+		System.out.println("[Main] Finished!");
+	    } catch (InterruptedException e) {
+	    	e.printStackTrace();
 	    }
+
 	}
 	
 	
