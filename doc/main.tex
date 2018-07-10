@@ -3,39 +3,44 @@
 \usepackage{verbatim}
 \usepackage{hyperref}
 \begin{document}
+
+\title{MonitorTCC: Monitoring a Timed Contract Calculus using Larva}
+\author{Alberto Aranda Garcia, Christian Colombo and Gordon J. Pace}
+\date{}
+\maketitle
+
+
 \section{Introduction}
 
-The objective of this tool is to translate a given timed contract to a Larva specification. This specification can be used to generate AspectJ code which, once weaved in a Java system, can be used to perform runtime verification on it.
-
-Figure 1 shows a usage flow example of the tool and the output provided by it.
+MonitorTCC is a tool to generate monitors of timed contracts written in the calculus of \cite{tcc} using the Larva monitoring tool\footnote{\url{https://github.com/ccol002/larva-rv-tool}} \cite{larva}, which in turn uses the aspect-oriented programming tool AspectJ to inject monitors in a Java system. This allows for the use of runtime monitors to flag violations of a contract by Java programs. Figure~\ref{f:usage} shows the tool usage.
 
 \begin{figure}[hp]
   \centering
   \includegraphics[scale=0.5]{Larva-rt-tutorial.png}
+\caption{MonitorTCC usage process}
+\label{f:usage}
 \end{figure}
 
-The role of the tool, highlighted in green, is the translation from a Contract Specification to a Larva Specification. The latter defines a DATE consisting of two states: an initial one, and a bad one, which the system reaches whenever the contract is violated.
-
-The result is, therefore, an AspectJ monitoring code, which can be used to verify in runtime if a contract is respected in a system.
+Larva specifications are written using an automata-based formalism, DATEs. In the translation made by the tool, ensures that bad states are only reached in the case of a contract violation.
+%The result is, therefore, an AspectJ monitoring code, which can be used to verify in runtime if a contract is respected in a system.
 
 \section{Contract Calculus}
 
-The language in which the contract are specified is based on the one explained in \cite{untimed}. The paper specifies the set of valid formulae, along with its semanics.
+The language in which the contract are specified is based on the one explained in \cite{untimed}. The paper specifies the set of valid formulae, along with its semantics.
 
-A contract defines what actions a certain agent is allowed, obligated, or forbidden to do within a specific amount of time. It can also be a conjuction or disjuction of contract, a sequential contract (the first contract must be enforced, then the second), a reparation contract (if the first contract is violated, the second must be enforced), a recursive contract (the contract must be enforced each given amount of time), a wait contract, or the trivially satisfied and violated ones.
+A contract defines what actions a certain agent is allowed, obligated, or forbidden to do within a specific amount of time. It can also be a conjunction or disjunction of contract, a sequential contract (the first contract must be enforced, then the second), a reparation contract (if the first contract is violated, the second must be enforced), a recursive contract (the contract must be enforced each given amount of time), a wait contract, or the trivially satisfied and violated ones.
 
 In the implementation, each agent will correspond to a Java class, while actions will correspond to method calls. Time is expressed in milliseconds.
 
-Table 1 shows an equivalence between each of the symbols of the language defined in the paper and the language that the tool will take as input.
-
-\clearpage
+Table~\ref{t:symbols} shows an equivalence between each of the symbols of the language defined in the paper and the language that the tool will take as input.
 
 \begin{table}[hp]
 \centering
-\caption{Equivalence table}
+\caption{Syntax of MonitorTCC}
 \label{my-label}
-\begin{tabular}{|l|l|l|}
- Symbol in the paper & Symbol in the implementation & Semantics \\ \hline
+\small
+\begin{tabular}{|l|l|l|}\hline
+ Logic symbol & MonitorTCC syntax & Semantics \\ \hline
  $\top$ & sat & Trivially satisfied                                    \\
  $\bot$ & vio & Trivially violated                                    \\
  wait(d) & wait[d] & Wait \textit{d} milliseconds                                   \\
@@ -46,9 +51,10 @@ Table 1 shows an equivalence between each of the symbols of the language defined
   $\violationrec$ & $>>$ & Reparation            \\
   $\ff{k}{a}[d]$  & F(a $->$ k){[}d{]} & Prohibition \\
   $\pp{k}{a}[d]$  & P(a $->$ k){[}d{]} & Permission (not implemented) \\
-  $\oo{k}{a}[d]$  & O(a $->$ k){[}d{]} & Obligation \\
-                                         
+  $\oo{k}{a}[d]$  & O(a $->$ k){[}d{]} & Obligation                              \\\hline
 \end{tabular}
+\normalsize
+\label{t:symbols}
 \end{table}
 
 Note that the paper defines a conditional contract which is not implemented yet. The permission contract is not implemented, neither.
@@ -86,10 +92,9 @@ Note that the tool does not allow binding a contract to a variable and then usin
 
 \normalsize
 
-\section{How to use}
-In order to use this tool, it is necessary to have the ANTLR parser generator tool installed. Instructions on how to do it are available in its official GitHub site \footnote{\url{https://github.com/antlr/antlr4/blob/master/doc/getting-started.md}}.
+\section{Compiling MonitorTCC}
 
-Once ANTLR is properly set up, the \textit{antlr4} and \textit{grun} commands being available, the grammar (inside the \textit{parser} directory) may be compiled as follows:
+In order to compile MonitorTCC, it is necessary to have the ANTLR parser generator tool installed. Instructions on how to do it are available in its official GitHub site\footnote{\url{https://github.com/antlr/antlr4/blob/master/doc/getting-started.md}}. Once ANTLR is properly set up, the \textit{antlr4} and \textit{grun} commands being available, the grammar (inside the \textit{parser} directory) may be compiled as follows:
 
 \begin{verbatim}
 javac ParseUtils/*.java
@@ -97,13 +102,15 @@ antlr4 ContractsToLarva.g4
 javac -cp . *.java
 \end{verbatim}
 
-Then, the resulting parser may be used to generate Larva code from a contract specified in \textit{contract.txt}:
+\section{Using MonitorTCC to Monitor Java a system}
 
-\begin{verbatim}
-grun ContractsToLarva s -o contract.txt > larva_output.lrv
-\end{verbatim}
+Then, the resulting parser may be used to generate Larva code from a contract specified in an input file $\langle\texttt{contract.txt}\rangle$ to produce a Larva specification in file $\langle\texttt{larvamonitor.lrv}\rangle$:
 
-Now, the code in \textit{$larva\_output.lrv$} may be used to generate the aspects necessary to monitor the desired system. Note that, both when compiling and using the aspects, the package \textit{contractModels} must be available in the Java Classpath. Makefiles automating both the grammar compilation process and the Larva code generation and use can be found in the \textit{parser} directory and the root directory, respectively.
+\[
+\texttt{grun ContractsToLarva s -o }\langle\texttt{contract.txt}\rangle\texttt{ > }\langle\texttt{larvamonitor.lrv}\rangle
+\]
+
+The file \textit{$larvamonitor.lrv$} may be used to generate the aspects necessary to monitor the desired system (see the Larva instruction manual). Note that, both when compiling and using the aspects, the package \textit{contractModels} must be available in the Java Classpath. Makefiles automating both the grammar compilation process and the Larva code generation and use can be found in the \textit{parser} directory and the root directory, respectively.
 
 \subsection{Example}
 A ready to use example of a system to be monitored is located in the \textit{exampleBoardingSystem} directory. A single agent, \textit{Passenger}, exists, and the actions it performs are located in \textit{Main.java}. For example, if we monitor the following code:
@@ -137,6 +144,9 @@ exampleBoardingSystem.Main.run(Main.java:16)
 java.lang.Thread.run(Thread.java:748) 
 \end{verbatim}
 
-Which is the expected one.
+Which, as expected, notifies a violation.
+
+\bibliographystyle{plain}
+\bibliography{refs}
 
 \end{document}
