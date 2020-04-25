@@ -22,6 +22,10 @@ s : contract EOF {
 contract returns [String def]:
 SAT {$def = "new TrueContract()";}
 | VIO {$def = "new FalseContract()";}
+| PCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {
+    l_events.add(new ParserEvent($k.text, $a.text));
+    $def = "new PermissionContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"), " + $INT.text + ")";
+}
 | OCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {
     l_events.add(new ParserEvent($k.text, $a.text));
     $def = "new ObligationContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"), " + $INT.text + ")";
@@ -29,6 +33,11 @@ SAT {$def = "new TrueContract()";}
 | FCON k=ID PERF a=ID CPARE OBRACK INT CBRACK {
     l_events.add(new ParserEvent($k.text, $a.text)); 
     $def = "new ProhibitionContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"), " + $INT.text + ")";
+}
+| COND k=ID PERF a=ID CPARE OBRACK INT CBRACK OPARE l=contract COMMA r=contract CPARE {
+  l_events.add(new ParserEvent($k.text, $a.text));
+  $def = "new ConditionalContract(new Event(\"" + $k.text + "\", \"" + $a.text + "\"),"
+  + $INT.text + ", " + $l.def + ", " + $r.def + ")";
 }
 | WAIT OBRACK INT CBRACK {$def = "new WaitContract(" + $INT.text + ")";}
 | l=contract SEQOP r=contract {$def = "new SequentialContract(" + $l.def + "," + $r.def + ")";}  
@@ -57,6 +66,7 @@ CBRACK : ']';
 OPARE : '(';
 CPARE : ')';
 DOT : '.';
+COMMA : ',';
 INT : [0-9]+;
 ID : [a-zA-Z]+;
 WS : [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines
